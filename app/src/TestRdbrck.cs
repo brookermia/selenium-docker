@@ -31,8 +31,6 @@ namespace SeleniumDocker
 
             finally
             {
-                //Thread sleep is only here so we can view the VNC client as the connection is closed as soon as test ends
-                Thread.Sleep(25000);
                 CloseBrowser();
             }
         }
