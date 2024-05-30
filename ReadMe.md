@@ -1,3 +1,5 @@
+# SPIKE - setup docker and run automated test and view test running
+
 https://redbrickmedia.atlassian.net/browse/ST-1699
 SPIKE for getting a webdriver running in a Docker env with options to:
 
