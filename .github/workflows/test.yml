@@ -20,7 +20,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build docker image
         run: |
-          docker build -t selenium-container .
+          docker build -t selenium-container . -f app/Dockerfile
       - name: Run docker test
         run: |
           docker run --rm -p 5900:5900 selenium-container --headless
