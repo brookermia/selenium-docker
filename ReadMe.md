@@ -93,3 +93,23 @@ A possible future consideration is creating a script that fetches the chromedriv
 **Different VNC Client**
 
 As I mentioned above, the VNC client I used RealVNC Viewer, made me make a free account which could be annoying. There might be better options for us out there. However, since all the ports are opened you could probably use any VNC Client
+
+**Installing WinAppDriver**
+
+To install WinAppDriver in your Dockerfile, we need to make sure the Docker container has a Windows base image, as WinAppDriver is designed to run on Windows. Since the current Dockerfile is based on Linux (using a .NET SDK and runtime), you'll need to adjust it to use a Windows base image.
+
+So We will need to do something like this:
+
+```
+FROM mcr.microsoft.com/dotnet/sdk:8.0-windowsservercore-ltsc2019 AS build-env
+WORKDIR /app
+
+...
+
+# Build runtime image
+FROM mcr.microsoft.com/dotnet/runtime:8.0-windowsservercore-ltsc2019
+WORKDIR /app
+COPY --from=build-env /app/src/out .
+```
+
+Although I worry this will become problematic for future Mac🍎capability
