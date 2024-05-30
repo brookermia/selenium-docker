@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  docker:
+  Set-up-env:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -18,6 +18,16 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build docker image
+        run: |
+          docker build -t selenium-container . -f app/Dockerfile
+      - name: Run docker test
+        run: |
+          docker run --rm -p 5900:5900 selenium-container --headless
+
+  build-and-run-docker:
+    runs-on: ubuntu-latest
+    steps:
       - name: Build docker image
         run: |
           docker build -t selenium-container . -f app/Dockerfile
