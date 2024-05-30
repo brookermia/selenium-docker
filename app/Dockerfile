@@ -3,11 +3,11 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
 WORKDIR /app
 
 # Copy csproj and restore as distinct layers
-COPY src/*.csproj ./src/
+COPY app/src/*.csproj ./src/
 RUN dotnet restore ./src/SeleniumDocker.csproj
 
 # Copy everything else and build
-COPY src/ ./src/
+COPY app/src/ ./src/
 WORKDIR /app/src
 RUN dotnet publish -c Release -o out
 
