@@ -59,7 +59,7 @@ RUN mkdir -p /app/drivers && \
 ENV RUNNING_IN_DOCKER=true
 ENV DISPLAY=:99
 
-COPY entrypoint.sh /app/entrypoint.sh
+COPY app/entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
 # Expose the VNC port
