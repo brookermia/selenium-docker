@@ -29,7 +29,9 @@ You need [docker desktop](https://www.docker.com/products/docker-desktop/) runni
 
 Navigate to the `app/` directory
 
-`docker build -t selenium-container .`
+`docker build -t selenium-container . -f app/Dockerfile`
+
+  *Needed to add `-f app/Dockerfile` because `app/` isn’t my root directory*
 
 **Non-headless:**
 
