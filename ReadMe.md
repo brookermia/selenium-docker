@@ -27,8 +27,6 @@ pw: `uxj_rpb3veu-AMT_vxt`
 
 You need [docker desktop](https://www.docker.com/products/docker-desktop/) running
 
-Navigate to the `app/` directory
-
 `docker build -t selenium-container . -f app/Dockerfile`
 
   *Needed to add `-f app/Dockerfile` because `app/` isn’t my root directory*
