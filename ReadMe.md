@@ -112,4 +112,4 @@ WORKDIR /app
 COPY --from=build-env /app/src/out .
 ```
 
-Although I worry this will become problematic for future Mac🍎capability
+We can use multiple dockerfiles so a separate one will need to be made for Mac🍎capability. 
