@@ -1,20 +1,5 @@
-# Use the official .NET SDK image from the Docker Hub
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
-WORKDIR /app
-
-# Copy csproj and restore as distinct layers
-COPY app/src/*.csproj ./src/
-RUN dotnet restore ./src/SeleniumDocker.csproj
-
-# Copy everything else and build
-COPY app/src/ ./src/
-WORKDIR /app/src
-RUN dotnet publish -c Release -o out
-
-# Build runtime image
-FROM mcr.microsoft.com/dotnet/runtime:8.0
-WORKDIR /app
-COPY --from=build-env /app/src/out .
+# Build base runtime image
+FROM mcr.microsoft.com/dotnet/runtime:8.0 as base
 
 # Install dependencies
 RUN apt-get update && \
@@ -37,10 +22,8 @@ RUN apt-get update && \
     xvfb \
     x11vnc \
     fonts-liberation \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install Chrome
-RUN curl -sSL https://dl.google.com/linux/linux_signing_key.pub | apt-key add - && \
+    && rm -rf /var/lib/apt/lists/* \
+    && curl -sSL https://dl.google.com/linux/linux_signing_key.pub | apt-key add - && \
     echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list && \
     apt-get update && \
     apt-get install -y google-chrome-stable && \
@@ -55,13 +38,30 @@ RUN mkdir -p /app/drivers && \
     chmod +x /app/drivers/chromedriver && \
     rm -rf /tmp/chromedriver-linux64.zip /tmp/chromedriver-linux64
 
-# Set environment variable to indicate running in Docker
-ENV RUNNING_IN_DOCKER=true
-ENV DISPLAY=:99
+# Use the official .NET SDK image from the Docker Hub
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
+WORKDIR /app
+
+# Copy csproj and restore as distinct layers
+COPY app/src/*.csproj ./src/
+RUN dotnet restore ./src/SeleniumDocker.csproj
+
+# Copy everything else and build
+COPY app/src/ ./src/
+WORKDIR /app/src
+RUN dotnet publish -c Release -o out
+
+FROM base as final
+
+WORKDIR /app
+COPY --from=build-env /app/src/out .
 
 COPY app/entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
+# Set environment variable to indicate running in Docker
+ENV RUNNING_IN_DOCKER=true
+ENV DISPLAY=:99
 # Expose the VNC port
 EXPOSE 5900
 
