@@ -31,6 +31,7 @@ jobs:
           tags: |
             miabrooker1/shift-automation:latest
           cache-from: type=registry,ref=miabrooker1/shift-automation:latest
+          cache-to: type=registry,ref=miabrooker1/shift-automation:latest,mode=max
 
   run:
     needs: build
