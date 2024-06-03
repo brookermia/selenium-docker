@@ -31,6 +31,7 @@ namespace SeleniumDocker
 
             finally
             {
+
                 CloseBrowser();
             }
         }

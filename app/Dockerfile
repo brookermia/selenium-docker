@@ -56,8 +56,8 @@ FROM base as final
 WORKDIR /app
 COPY --from=build-env /app/src/out .
 
-COPY app/testpoint.sh /app/testpoint.sh
-RUN chmod +x /app/testpoint.sh
+COPY app/entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
 # Set environment variable to indicate running in Docker
 ENV RUNNING_IN_DOCKER=true
@@ -65,4 +65,4 @@ ENV DISPLAY=:99
 # Expose the VNC port
 EXPOSE 5900
 
-ENTRYPOINT ["/app/testpoint.sh"]
+ENTRYPOINT ["/app/entrypoint.sh"]

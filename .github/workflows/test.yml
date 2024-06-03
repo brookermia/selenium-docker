@@ -30,6 +30,7 @@ jobs:
           push: true
           tags: |
             miabrooker1/shift-automation:latest
+          cache-from: type=registry,ref=miabrooker1/shift-automation:latest
 
   run:
     needs: build
