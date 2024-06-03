@@ -1,4 +1,4 @@
-name: Build and Run Dockerfile
+name: Build, cache, and update Dockerhub:latest
 
 on:
   push:
