@@ -65,4 +65,4 @@ ENV DISPLAY=:99
 # Expose the VNC port
 EXPOSE 5900
 
-ENTRYPOINT ["/app/entrypoint.sh"]
+ENTRYPOINT ["bash", "-c", "sed -i 's/\\r$//' /app/entrypoint.sh && /app/entrypoint.sh"]
