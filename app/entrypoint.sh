@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 # Start Selenium test
 echo "Starting Selenium test"
 if [ "$1" = "--headless" ]; then
