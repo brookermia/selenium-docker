@@ -24,9 +24,7 @@ Write-Output "$(Get-Timestamp): Starting Selenium test"
 # List common paths for dotnet.exe
 $possibleDotnetPaths = @(
     "C:\Program Files\dotnet\dotnet.exe",
-    "C:\Program Files (x86)\dotnet\dotnet.exe",
-    "C:\Windows\Microsoft.NET\Framework64\v4.0.30319\MSBuild.exe",
-    "C:\Windows\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe"
+    "C:\Program Files (x86)\dotnet\dotnet.exe"
 )
 
 $dotnetPath = $null
@@ -47,10 +45,11 @@ Write-Output "$(Get-Timestamp): Using dotnet path: $dotnetPath"
 
 Write-Output "$(Get-Timestamp): Running the seleniumdocker.dll file."
 if ($args[0] -eq "--headless") {
-    $result = Start-Process -NoNewWindow -FilePath $dotnetPath -ArgumentList "SeleniumDocker.dll --headless" -Wait -PassThru
+    $result = Start-Process -NoNewWindow -FilePath "dotnet" -ArgumentList "seleniumdocker.dll --headless" -Wait -PassThru
 } else {
-    $result = Start-Process -NoNewWindow -FilePath $dotnetPath -ArgumentList "SeleniumDocker.dll" -Wait -PassThru
+    $result = Start-Process -NoNewWindow -FilePath "dotnet" -ArgumentList "seleniumdocker.dll" -Wait -PassThru
 }
+
 
 if ($result.ExitCode -eq 0) {
     Write-Output "$(Get-Timestamp): Tests passed successfully."

@@ -5,17 +5,29 @@ FROM mcr.microsoft.com/dotnet/framework/runtime:4.8-windowsservercore-ltsc2022 a
 RUN powershell -NoProfile -ExecutionPolicy Bypass -Command \
     iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1')); \
     choco feature enable -n=allowGlobalConfirmation; \
-    choco install googlechrome; \
-    choco install selenium-chrome-driver; \
-    choco install winappdriver
+    choco install googlechrome --version=125.0.6422.1413 -y; \
+    # choco install selenium-chrome-driver --version=125.0.6422.1413 -y; \
+    choco install chromedriver --version=125.0.6422.1413 -y \
+    choco install winappdriver -y; \
+    choco install dotnet-8.0-sdk -y
+    # choco install dotnetfx --version=8.0.0 -y; \
+    # choco install dotnetcore-sdk -y
 
-    # Enable Developer Mode directly
+# Create a directory for drivers and move chromedriver there
+RUN powershell -Command \
+    New-Item -ItemType Directory -Path C:\app\drivers -Force; \
+    Move-Item -Path C:\ProgramData\chocolatey\lib\chromedriver\tools\chromedriver-win32\chromedriver.exe -Destination C:\app\drivers
+
+# Set the PATH environment variable to include the path to the Chrome binary
+RUN powershell -Command \
+    $env:PATH += \";C:\Program Files\Google\Chrome\Application\"; \
+    [System.Environment]::SetEnvironmentVariable(\"PATH\", $env:PATH, [System.EnvironmentVariableTarget]::Machine)
+# Enable Developer Mode directly
 RUN powershell -Command \
     Set-ExecutionPolicy Unrestricted -Scope Process -Force; \
     New-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" -Force; \
     Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" -Name "AllowDevelopmentWithoutDevLicense" -Value 1; \
     Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" -Name "AllowAllTrustedApps" -Value 1
-
 
 # Use the official .NET SDK image from the Docker Hub
 FROM mcr.microsoft.com/dotnet/framework/sdk:4.8-windowsservercore-ltsc2022 AS build-env
@@ -54,7 +66,7 @@ RUN powershell -Command \
     icacls C:\app\entrypoint.ps1 /grant Everyone:F; 
 
 # Set environment variable to indicate running in Docker
-ENV RUNNING_IN_DOCKER=true
+ENV RUNNING_IN_DOCKER_WINDOWS=true
 # Expose the VNC port
 EXPOSE 5900
 

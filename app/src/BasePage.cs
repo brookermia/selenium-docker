@@ -13,7 +13,11 @@ namespace SeleniumDocker
         {
             string chromeDriverPath;
 
-            if (Environment.GetEnvironmentVariable("RUNNING_IN_DOCKER") == "true")
+            if (Environment.GetEnvironmentVariable("RUNNING_IN_DOCKER_WINDOWS") == "true")
+            {
+                chromeDriverPath = @"C:\app\drivers\chromedriver.exe"; // Path inside Docker
+            }
+            else if (Environment.GetEnvironmentVariable("RUNNING_IN_DOCKER_LINUX") == "true")
             {
                 chromeDriverPath = "/app/drivers/chromedriver"; // Path inside Docker
             }
@@ -35,12 +39,13 @@ namespace SeleniumDocker
             {
                 chromeOptions.AddArgument("--headless");
             }
-
-            chromeOptions.AddArgument("--disable-dev-shm-usage");
-            chromeOptions.AddArgument("--no-sandbox");
-            chromeOptions.AddArgument("--disable-extensions");
-            chromeOptions.AddArgument("--disable-gpu");
-            chromeOptions.AddArgument("--window-size=1280,1024");
+            chromeOptions.AddArgument("--headless");  // Enables headless mode.
+            chromeOptions.AddArgument("--disable-gpu");  // Disables GPU hardware acceleration.
+            chromeOptions.AddArgument("--no-sandbox");  // Disables the sandbox for all process types.
+            chromeOptions.AddArgument("--disable-dev-shm-usage");  // Uses /tmp instead of /dev/shm.
+            chromeOptions.AddArgument("--disable-features=NetworkService,NetworkServiceInProcess");  // Disables specific features.
+            chromeOptions.AddArgument("--disable-infobars");  // Prevents infobars from appearing.
+            chromeOptions.AddArgument("--remote-debugging-port=9222");
 
             var service = ChromeDriverService.CreateDefaultService(Path.GetDirectoryName(chromeDriverPath), Path.GetFileName(chromeDriverPath));
             driver = new ChromeDriver(service, chromeOptions);
