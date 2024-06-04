@@ -15,3 +15,6 @@ if [ "$1" = "--headless" ]; then
 else
     dotnet SeleniumDocker.dll
 fi
+
+
+# docker run --entrypoint bash -it --rm -p 5900:5900 selenium-container

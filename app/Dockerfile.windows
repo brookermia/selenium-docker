@@ -1,0 +1,61 @@
+# Use an appropriate Windows base image
+FROM mcr.microsoft.com/dotnet/framework/runtime:4.8-windowsservercore-ltsc2022 as base
+
+# Install Chocolatey and dependencies
+RUN powershell -NoProfile -ExecutionPolicy Bypass -Command \
+    iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1')); \
+    choco feature enable -n=allowGlobalConfirmation; \
+    choco install googlechrome; \
+    choco install selenium-chrome-driver; \
+    choco install winappdriver
+
+    # Enable Developer Mode directly
+RUN powershell -Command \
+    Set-ExecutionPolicy Unrestricted -Scope Process -Force; \
+    New-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" -Force; \
+    Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" -Name "AllowDevelopmentWithoutDevLicense" -Value 1; \
+    Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" -Name "AllowAllTrustedApps" -Value 1
+
+
+# Use the official .NET SDK image from the Docker Hub
+FROM mcr.microsoft.com/dotnet/framework/sdk:4.8-windowsservercore-ltsc2022 AS build-env
+WORKDIR /app
+
+# Copy csproj and restore as distinct layers
+COPY app/src/*.csproj ./src/
+RUN dotnet restore ./src/SeleniumDocker.csproj
+
+# Copy everything else and build
+COPY app/src/ ./src/
+WORKDIR /app/src
+RUN dotnet publish -c Release -o out
+
+FROM base as final
+
+WORKDIR /app
+COPY --from=build-env /app/src/out .
+
+# Copy the Shift installer into the container
+COPY app/downloads/Shift-*.exe /app/downloads/
+COPY app/install_shift.ps1 /app/install_shift.ps1
+
+# Set execution policy and grant permissions
+RUN powershell -Command \
+    Set-ExecutionPolicy Unrestricted -Scope Process -Force; \
+    icacls C:\app\install_shift.ps1 /grant Everyone:F
+
+# Run the install script
+# RUN powershell -Command \
+#     C:\app\install_shift.ps1
+
+COPY app/entrypoint.ps1 /app/entrypoint.ps1
+RUN powershell -Command \
+    Set-ExecutionPolicy Unrestricted -Scope Process -Force; \
+    icacls C:\app\entrypoint.ps1 /grant Everyone:F; 
+
+# Set environment variable to indicate running in Docker
+ENV RUNNING_IN_DOCKER=true
+# Expose the VNC port
+EXPOSE 5900
+
+ENTRYPOINT ["powershell.exe", "/app/entrypoint.ps1"]

@@ -43,7 +43,7 @@ Once the test is running open your VNC client, click new connection and enter th
 
 `docker run --rm -p 5900:5900 selenium-container --headless`
 
-## 🏡How to run locally
+# 🏡How to run locally
 
 First you need to manually download the correct [chrome driver](https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json). Place the `exe` file into the `app/drivers` directory.
 
@@ -55,7 +55,9 @@ Navigate to the `src/` directory
 
 `dotnet run`
 
-### 🔮Future Considerations
+Ensure you're running on a Linux Container when using the `Dockerfile` and Windows Container when using the `Dockerfile.windows`
+
+## 🔮Future Considerations
 
 **scripts directory**
 
@@ -113,3 +115,5 @@ COPY --from=build-env /app/src/out .
 ```
 
 We can use multiple dockerfiles so a separate one will need to be made for Mac🍎capability. 
+
+It appears that using Git Actions, we can easily let the actions decide which container to build 

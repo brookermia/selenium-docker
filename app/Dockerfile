@@ -1,4 +1,4 @@
-# Build base runtime image
+# Use an appropriate base image
 FROM mcr.microsoft.com/dotnet/runtime:8.0 as base
 
 # Install dependencies
@@ -31,12 +31,25 @@ RUN apt-get update && \
 
 # Download and install ChromeDriver to /app/drivers directory
 # Chromedriver script is HARDCODED. See ReadMe and future considerations: chromedriver script
+# docker run --entrypoint bash -it --rm -p 5900:5900 selenium-container
 RUN mkdir -p /app/drivers && \
     wget -O /tmp/chromedriver-linux64.zip https://storage.googleapis.com/chrome-for-testing-public/125.0.6422.76/linux64/chromedriver-linux64.zip && \
     unzip /tmp/chromedriver-linux64.zip -d /tmp/ && \
     mv /tmp/chromedriver-linux64/chromedriver /app/drivers/chromedriver && \
     chmod +x /app/drivers/chromedriver && \
     rm -rf /tmp/chromedriver-linux64.zip /tmp/chromedriver-linux64
+
+# Copy the Shift installer into the container
+COPY app/downloads/Shift-*.exe /app/downloads/
+
+# Find and install the Shift application
+# Script to find and install the Shift application
+RUN set -e; \
+    for file in /app/downloads/Shift-*.exe; do \
+        echo "Found executable: $file"; \
+        chmod +x "$file"; \
+        "$file" /S || true; \
+    done
 
 # Use the official .NET SDK image from the Docker Hub
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
