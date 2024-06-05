@@ -1,17 +1,14 @@
 # Use an appropriate Windows base image
-FROM mcr.microsoft.com/dotnet/framework/runtime:4.8-windowsservercore-ltsc2022 as base
+FROM mcr.microsoft.com/windows:20H2 as base
 
 # Install Chocolatey and dependencies
 RUN powershell -NoProfile -ExecutionPolicy Bypass -Command \
     iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1')); \
     choco feature enable -n=allowGlobalConfirmation; \
-    choco install googlechrome --version=125.0.6422.1413 -y; \
-    # choco install selenium-chrome-driver --version=125.0.6422.1413 -y; \
-    choco install chromedriver --version=125.0.6422.1413 -y \
+    choco install googlechrome -y; \
+    choco install chromedriver -y; \
     choco install winappdriver -y; \
     choco install dotnet-8.0-sdk -y
-    # choco install dotnetfx --version=8.0.0 -y; \
-    # choco install dotnetcore-sdk -y
 
 # Create a directory for drivers and move chromedriver there
 RUN powershell -Command \
@@ -22,6 +19,7 @@ RUN powershell -Command \
 RUN powershell -Command \
     $env:PATH += \";C:\Program Files\Google\Chrome\Application\"; \
     [System.Environment]::SetEnvironmentVariable(\"PATH\", $env:PATH, [System.EnvironmentVariableTarget]::Machine)
+
 # Enable Developer Mode directly
 RUN powershell -Command \
     Set-ExecutionPolicy Unrestricted -Scope Process -Force; \
@@ -58,12 +56,13 @@ RUN powershell -Command \
 
 # Run the install script
 # RUN powershell -Command \
+#     Set-ExecutionPolicy Unrestricted -Scope Process -Force; \
 #     C:\app\install_shift.ps1
 
 COPY app/entrypoint.ps1 /app/entrypoint.ps1
 RUN powershell -Command \
     Set-ExecutionPolicy Unrestricted -Scope Process -Force; \
-    icacls C:\app\entrypoint.ps1 /grant Everyone:F; 
+    icacls C:\app\entrypoint.ps1 /grant Everyone:F
 
 # Set environment variable to indicate running in Docker
 ENV RUNNING_IN_DOCKER_WINDOWS=true
