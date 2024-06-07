@@ -21,8 +21,8 @@ jobs:
 
     - name: Install WinAppDriver
       run: |
-        Invoke-WebRequest -Uri "https://github.com/microsoft/WinAppDriver/releases/download/v1.2.1/WindowsApplicationDriver.msi" -OutFile "C:\WindowsApplicationDriver.msi"
-        Start-Process msiexec.exe -ArgumentList "/i C:\WindowsApplicationDriver.msi /quiet /norestart" -NoNewWindow -Wait
+        Invoke-WebRequest -Uri "https://github.com/microsoft/WinAppDriver/releases/download/v1.2.99/WindowsApplicationDriver-1.2.99-win-x86.exe" -OutFile "C:\WindowsApplicationDriver.exe"
+        Start-Process msiexec.exe -ArgumentList "/i C:\WindowsApplicationDriver.exe /quiet /norestart" -NoNewWindow -Wait
 
     - name: Enable Developer Mode for WinAppDriver
       run: Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" -Name "AllowDevelopmentWithoutDevLicense" -Value 1
