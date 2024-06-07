@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push: {}
+  pull_request: {}
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: '8.0.' # Check .NET versions
+
+    - name: Install WinAppDriver
+      run: |
+        Invoke-WebRequest -Uri "https://github.com/microsoft/WinAppDriver/releases/download/v1.2.1/WindowsApplicationDriver.msi" -OutFile "C:\WindowsApplicationDriver.msi"
+        Start-Process msiexec.exe -ArgumentList "/i C:\WindowsApplicationDriver.msi /quiet /norestart" -NoNewWindow -Wait
+
+    - name: Enable Developer Mode for WinAppDriver
+      run: Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" -Name "AllowDevelopmentWithoutDevLicense" -Value 1
+
+    - name: Download Shift Installer
+      run: |
+        Invoke-WebRequest -Uri "https://app.shift.com/recipes/1?tracking_id=test_production_full" -OutFile "C:\ShiftInstaller.exe"
+
+    - name: Install Shift
+      run: Start-Process -FilePath "C:\ShiftInstaller.exe" -ArgumentList "/silent" -NoNewWindow -Wait
+
+    - name: Install Google Chrome
+      run: |
+        Invoke-WebRequest -Uri "https://dl.google.com/chrome/install/latest/chrome_installer.exe" -OutFile "C:\chrome_installer.exe"
+        Start-Process -FilePath "C:\chrome_installer.exe" -ArgumentList "/silent /install" -NoNewWindow -Wait
+
+    - name: Install ChromeDriver
+      run: |
+        $chromeDriverVersion = Invoke-RestMethod -Uri "https://chromedriver.storage.googleapis.com/LATEST_RELEASE"
+        Invoke-WebRequest -Uri "https://chromedriver.storage.googleapis.com/$chromeDriverVersion/chromedriver_win32.zip" -OutFile "C:\chromedriver_win32.zip"
+        Expand-Archive -Path "C:\chromedriver_win32.zip" -DestinationPath "C:\chromedriver"
+        $env:Path += ";C:\chromedriver"
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build app/ --configuration Release --no-restore
+
+    - name: Run tests
+      run: dotnet test app/ --no-build --verbosity normal
