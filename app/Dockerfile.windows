@@ -1,5 +1,5 @@
 # Use an appropriate Windows base image
-FROM mcr.microsoft.com/nanoserver:ltsc2022 as base
+FROM mcr.microsoft.com/windows:20H2 as base
 
 # Install Chocolatey and dependencies
 RUN powershell -NoProfile -ExecutionPolicy Bypass -Command \
