@@ -27,14 +27,22 @@ jobs:
     - name: Enable Developer Mode for WinAppDriver
       run: Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" -Name "AllowDevelopmentWithoutDevLicense" -Value 1
 
-    - name: Download Shift Installer
+    # - name: Download Shift Installer
+    #   run: |
+    #     $shiftInstallerUrl = "https://app.shift.com/recipes/1?tracking_id=test_production_full"
+    #     Invoke-WebRequest -Uri $shiftInstallerUrl -OutFile "C:\ShiftInstaller.exe"
+    #     if (Test-Path "C:\ShiftInstaller.exe") {
+    #       Write-Output "Shift installer downloaded successfully."
+    #     } else {
+    #       throw "Failed to download Shift installer."
+    #     }
+    - name: Install Shift
       run: |
-        $shiftInstallerUrl = "https://app.shift.com/recipes/1?tracking_id=test_production_full"
-        Invoke-WebRequest -Uri $shiftInstallerUrl -OutFile "C:\ShiftInstaller.exe"
-        if (Test-Path "C:\ShiftInstaller.exe") {
-          Write-Output "Shift installer downloaded successfully."
+        $shiftInstaller = Get-ChildItem -Path "app/downloads" -Filter "Shift*.exe" | Select-Object -First 1
+        if ($shiftInstaller) {
+          Start-Process -FilePath $shiftInstaller.FullName -ArgumentList "/silent" -NoNewWindow -Wait
         } else {
-          throw "Failed to download Shift installer."
+          throw "Shift installer is not available."
         }
 
     - name: Install Google Chrome
