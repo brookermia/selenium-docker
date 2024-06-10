@@ -1,26 +1,53 @@
-name: Build and Run Dockerfile
+name: Build, cache, and update Dockerhub:latest
 
 on:
   push:
     branches:
-      - main
+      - "**"
+  workflow_dispatch:
 
 jobs:
-  Set-up-env:
+  build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-      - name: Login to Docker Hub
+
+      - name: Log in to DockerHub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build docker image
+
+      - name: Build and push Docker image with cache
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./app/Dockerfile
+          push: true
+          tags: |
+            miabrooker1/shift-automation:latest
+          cache-from: type=registry,ref=miabrooker1/shift-automation:cache
+          cache-to: type=registry,ref=miabrooker1/shift-automation:cache,mode=min
+
+  run:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Log in to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Pull Docker image
+        run: docker pull miabrooker1/shift-automation:latest
+
+      - name: Run Docker container
         run: |
-          docker build -t selenium-container . -f app/Dockerfile
-      - name: Run docker test
-        run: |
-          docker run --rm -p 5900:5900 selenium-container --headless
+          docker run --rm miabrooker1/shift-automation:latest --headless
