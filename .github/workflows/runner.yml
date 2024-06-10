@@ -38,9 +38,12 @@ jobs:
     #     }
     - name: Install Shift
       run: |
+        Write-Output "Looking for Shift installer in the app/downloads directory..."
         $shiftInstaller = Get-ChildItem -Path "app/downloads" -Filter "Shift*.exe" | Select-Object -First 1
         if ($shiftInstaller) {
-          Start-Process -FilePath $shiftInstaller.FullName -ArgumentList "/silent" -NoNewWindow -Wait
+          Write-Output "Found Shift installer: $($shiftInstaller.FullName)"
+          Start-Process -FilePath $shiftInstaller.FullName -ArgumentList "/silent" -NoNewWindow -Wait -Timeout 300
+          Write-Output "Shift installation completed."
         } else {
           throw "Shift installer is not available."
         }
