@@ -1,5 +1,5 @@
 # Use an appropriate Windows base image
-FROM mcr.microsoft.com/windows:20H2 as base
+FROM mcr.microsoft.com/nanoserver:ltsc2022 as base
 
 # Install Chocolatey and dependencies
 RUN powershell -NoProfile -ExecutionPolicy Bypass -Command \
@@ -10,22 +10,17 @@ RUN powershell -NoProfile -ExecutionPolicy Bypass -Command \
     choco install winappdriver -y; \
     choco install dotnet-8.0-sdk -y
 
-# Create a directory for drivers and move chromedriver there
-RUN powershell -Command \
+# Create a directory for drivers and move chromedriver there. Set developermode
+RUN powershell -Command "& { \
     New-Item -ItemType Directory -Path C:\app\drivers -Force; \
-    Move-Item -Path C:\ProgramData\chocolatey\lib\chromedriver\tools\chromedriver-win32\chromedriver.exe -Destination C:\app\drivers
-
-# Set the PATH environment variable to include the path to the Chrome binary
-RUN powershell -Command \
+    Move-Item -Path C:\ProgramData\chocolatey\lib\chromedriver\tools\chromedriver-win32\chromedriver.exe -Destination C:\app\drivers; \
     $env:PATH += \";C:\Program Files\Google\Chrome\Application\"; \
-    [System.Environment]::SetEnvironmentVariable(\"PATH\", $env:PATH, [System.EnvironmentVariableTarget]::Machine)
-
-# Enable Developer Mode directly
-RUN powershell -Command \
+    [System.Environment]::SetEnvironmentVariable(\"PATH\", $env:PATH, [System.EnvironmentVariableTarget]::Machine); \
     Set-ExecutionPolicy Unrestricted -Scope Process -Force; \
-    New-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" -Force; \
-    Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" -Name "AllowDevelopmentWithoutDevLicense" -Value 1; \
-    Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" -Name "AllowAllTrustedApps" -Value 1
+    New-Item -Path \"HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock\" -Force; \
+    Set-ItemProperty -Path \"HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock\" -Name \"AllowDevelopmentWithoutDevLicense\" -Value 1; \
+    Set-ItemProperty -Path \"HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock\" -Name \"AllowAllTrustedApps\" -Value 1; \
+    }"
 
 # Use the official .NET SDK image from the Docker Hub
 FROM mcr.microsoft.com/dotnet/framework/sdk:4.8-windowsservercore-ltsc2022 AS build-env
@@ -47,23 +42,20 @@ COPY --from=build-env /app/src/out .
 
 # Copy the Shift installer into the container
 COPY app/downloads/Shift-*.exe /app/downloads/
-COPY app/install_shift.ps1 /app/install_shift.ps1
+COPY app/entrypoint.ps1 /app/entrypoint.ps1
 
-# Set execution policy and grant permissions
-RUN powershell -Command \
+# Set execution policy and grant permissions for both scripts in a single RUN command
+RUN powershell -Command "& { \
     Set-ExecutionPolicy Unrestricted -Scope Process -Force; \
-    icacls C:\app\install_shift.ps1 /grant Everyone:F
+    icacls C:\app\install_shift.ps1 /grant Everyone:F; \
+    icacls C:\app\entrypoint.ps1 /grant Everyone:F; \
+    }"
 
 RUN powershell -Command "& { \
     $process = Start-Process -FilePath \"C:\app\downloads\Shift-*.exe\" -ArgumentList \"/silent\" -PassThru; \
     $process.WaitForExit(); \
     Remove-Item -Path \"C:\app\downloads\Shift-*.exe\" -Force; \
     }"
-
-COPY app/entrypoint.ps1 /app/entrypoint.ps1
-RUN powershell -Command \
-    Set-ExecutionPolicy Unrestricted -Scope Process -Force; \
-    icacls C:\app\entrypoint.ps1 /grant Everyone:F
 
 # Set environment variable to indicate running in Docker
 ENV RUNNING_IN_DOCKER_WINDOWS=true
