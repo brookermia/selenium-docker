@@ -62,8 +62,8 @@ jobs:
 
     - name: Create solution file
       run: |
-        dotnet new sln -n SeleniumDocker
-        dotnet sln SeleniumDocker.sln add app/src/SeleniumDocker.csproj
+        dotnet new sln -n SeleniumDocker --force
+        dotnet sln SeleniumDocker.sln add src/SeleniumDocker.csproj
       working-directory: app
 
     - name: Restore dependencies
