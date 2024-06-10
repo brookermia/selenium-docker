@@ -15,7 +15,7 @@ jobs:
     - name: Set up .NET
       uses: actions/setup-dotnet@v2
       with:
-        dotnet-version: 
+        dotnet-version: |
           5.0.x
           8.0.x
 
