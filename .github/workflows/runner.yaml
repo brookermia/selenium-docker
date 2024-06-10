@@ -37,13 +37,13 @@ jobs:
           throw "Failed to download Shift installer."
         }
 
-    - name: Install Shift
-      run: |
-        if (Test-Path "C:\ShiftInstaller.exe") {
-          Start-Process -FilePath "C:\ShiftInstaller.exe" -ArgumentList "/silent" -NoNewWindow -Wait
-        } else {
-          throw "Shift installer is not available."
-        }
+    # - name: Install Shift
+    #   run: |
+    #     if (Test-Path "C:\ShiftInstaller.exe") {
+    #       Start-Process -FilePath "C:\ShiftInstaller.exe" -ArgumentList "/silent" -NoNewWindow -Wait
+    #     } else {
+    #       throw "Shift installer is not available."
+    #     }
 
     - name: Install Google Chrome
       run: |
