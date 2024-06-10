@@ -8,14 +8,18 @@ namespace SeleniumDocker
     [TestClass]
     public class TestRdbrck : BasePage
     {
-        public TestRdbrck(bool headless = true) : base(headless) { }
+        // Parameterless constructor required by MSTest
+        public TestRdbrck() : base(true) { }
+
+        // Constructor with parameters (optional)
+        public TestRdbrck(bool headless) : base(headless) { }
 
         [TestMethod]
         public void TestRdbrckHomepage()
         {
             try
             {
-                // Navigate to Google
+                // Navigate to Redbrick homepage
                 driver.Navigate().GoToUrl("https://www.rdbrck.com/");
 
                 // Assert that the title is correct
