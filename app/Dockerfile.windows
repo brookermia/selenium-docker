@@ -5,13 +5,11 @@ FROM mcr.microsoft.com/dotnet/framework/runtime:4.8-windowsservercore-ltsc2022 a
 RUN powershell -NoProfile -ExecutionPolicy Bypass -Command \
     iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1')); \
     choco feature enable -n=allowGlobalConfirmation; \
-    choco install googlechrome --version=125.0.6422.1413 -y; \
-    # choco install selenium-chrome-driver --version=125.0.6422.1413 -y; \
-    choco install chromedriver --version=125.0.6422.1413 -y \
+    choco install googlechrome -y; \
+    choco install chromedriver -y \
     choco install winappdriver -y; \
     choco install dotnet-8.0-sdk -y
-    # choco install dotnetfx --version=8.0.0 -y; \
-    # choco install dotnetcore-sdk -y
+
 
 # Create a directory for drivers and move chromedriver there
 RUN powershell -Command \
@@ -56,9 +54,11 @@ RUN powershell -Command \
     Set-ExecutionPolicy Unrestricted -Scope Process -Force; \
     icacls C:\app\install_shift.ps1 /grant Everyone:F
 
-# Run the install script
-# RUN powershell -Command \
-#     C:\app\install_shift.ps1
+# Run the installer to install Shift
+RUN powershell -Command \
+    Start-Process -FilePath "C:\app\downloads\Shift-*.exe" -ArgumentList "/silent" -Wait; \
+    Remove-Item -Path "C:\app\downloads\Shift-*.exe" -Force
+
 
 COPY app/entrypoint.ps1 /app/entrypoint.ps1
 RUN powershell -Command \
@@ -70,4 +70,4 @@ ENV RUNNING_IN_DOCKER_WINDOWS=true
 # Expose the VNC port
 EXPOSE 5900
 
-ENTRYPOINT ["powershell.exe", "/app/entrypoint.ps1"]
+ENTRYPOINT ["powershell.exe", "/app/entrypoint.ps1", "cmd.exe"] 
