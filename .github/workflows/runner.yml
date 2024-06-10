@@ -15,7 +15,7 @@ jobs:
     - name: Set up .NET
       uses: actions/setup-dotnet@v2
       with:
-        dotnet-version: | 
+        dotnet-version: 
           5.0.x
           8.0.x
 
@@ -36,14 +36,6 @@ jobs:
         } else {
           throw "Failed to download Shift installer."
         }
-
-    # - name: Install Shift
-    #   run: |
-    #     if (Test-Path "C:\ShiftInstaller.exe") {
-    #       Start-Process -FilePath "C:\ShiftInstaller.exe" -ArgumentList "/silent" -NoNewWindow -Wait
-    #     } else {
-    #       throw "Shift installer is not available."
-    #     }
 
     - name: Install Google Chrome
       run: |
@@ -70,7 +62,7 @@ jobs:
       run: dotnet restore app/SeleniumDocker.sln
 
     - name: Build
-      run: dotnet build app/SeleniumDocker.sln --configuration Release --no-restore
+      run: dotnet build app/SeleniumDocker.sln --configuration Debug --no-restore
 
     - name: Run tests
       run: dotnet test app/SeleniumDocker.sln --no-build --verbosity normal
