@@ -57,11 +57,20 @@ jobs:
         Expand-Archive -Path "C:\chromedriver_win32.zip" -DestinationPath "C:\chromedriver"
         $env:Path += ";C:\chromedriver"
 
+    - name: List files in app directory
+      run: dir app
+
+    - name: Create solution file
+      run: |
+        dotnet new sln -n SeleniumDocker
+        dotnet sln SeleniumDocker.sln add app/src/SeleniumDocker.csproj
+      working-directory: app
+
     - name: Restore dependencies
-      run: dotnet restore app/src/SeleniumDocker.sln
+      run: dotnet restore app/SeleniumDocker.sln
 
     - name: Build
-      run: dotnet build app/src/SeleniumDocker.sln --configuration Release --no-restore
+      run: dotnet build app/SeleniumDocker.sln --configuration Release --no-restore
 
     - name: Run tests
-      run: dotnet test app/src/SeleniumDocker.sln --no-build --verbosity normal
+      run: dotnet test app/SeleniumDocker.sln --no-build --verbosity normal
