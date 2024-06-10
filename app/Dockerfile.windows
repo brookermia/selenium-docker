@@ -47,7 +47,6 @@ COPY app/entrypoint.ps1 /app/entrypoint.ps1
 # Set execution policy and grant permissions for both scripts in a single RUN command
 RUN powershell -Command "& { \
     Set-ExecutionPolicy Unrestricted -Scope Process -Force; \
-    icacls C:\app\install_shift.ps1 /grant Everyone:F; \
     icacls C:\app\entrypoint.ps1 /grant Everyone:F; \
     }"
 

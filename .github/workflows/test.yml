@@ -27,7 +27,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: ./app/Dockerfile
+          file: ./app/Dockerfile.windows
           push: true
           tags: |
             miabrooker1/shift-automation:latest
