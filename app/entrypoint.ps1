@@ -14,7 +14,8 @@ Write-Output "$(Get-Timestamp): Checking Developer Mode"
 $developerModeEnabled = Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" -Name "AllowDevelopmentWithoutDevLicense" -ErrorAction SilentlyContinue
 if ($null -eq $developerModeEnabled) {
     Write-Output "$(Get-Timestamp): Developer Mode is not enabled. This may cause issues."
-} else {
+}
+else {
     Write-Output "$(Get-Timestamp): Developer Mode is enabled."
 }
 
@@ -46,17 +47,18 @@ Write-Output "$(Get-Timestamp): Using dotnet path: $dotnetPath"
 Write-Output "$(Get-Timestamp): Running the seleniumdocker.dll file."
 if ($args[0] -eq "--headless") {
     $result = Start-Process -NoNewWindow -FilePath "dotnet" -ArgumentList "seleniumdocker.dll --headless" -Wait -PassThru
-} else {
+}
+else {
     $result = Start-Process -NoNewWindow -FilePath "dotnet" -ArgumentList "seleniumdocker.dll" -Wait -PassThru
 }
 
 
 if ($result.ExitCode -eq 0) {
     Write-Output "$(Get-Timestamp): Tests passed successfully."
-} else {
+}
+else {
     Write-Output "$(Get-Timestamp): Tests failed with exit code $($result.ExitCode)."
 }
 
-# Wait indefinitely to keep the container running
-Write-Output "$(Get-Timestamp): Script finished. Keeping container alive."
-Start-Sleep -Seconds 86400
+exit
+

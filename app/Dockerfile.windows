@@ -54,11 +54,11 @@ RUN powershell -Command \
     Set-ExecutionPolicy Unrestricted -Scope Process -Force; \
     icacls C:\app\install_shift.ps1 /grant Everyone:F
 
-# Run the installer to install Shift
-RUN powershell -Command \
-    Start-Process -FilePath "C:\app\downloads\Shift-*.exe" -ArgumentList "/silent" -Wait; \
-    Remove-Item -Path "C:\app\downloads\Shift-*.exe" -Force
-
+RUN powershell -Command "& { \
+    $process = Start-Process -FilePath \"C:\app\downloads\Shift-*.exe\" -ArgumentList \"/silent\" -PassThru; \
+    $process.WaitForExit(); \
+    Remove-Item -Path \"C:\app\downloads\Shift-*.exe\" -Force; \
+    }"
 
 COPY app/entrypoint.ps1 /app/entrypoint.ps1
 RUN powershell -Command \
@@ -70,4 +70,4 @@ ENV RUNNING_IN_DOCKER_WINDOWS=true
 # Expose the VNC port
 EXPOSE 5900
 
-ENTRYPOINT ["powershell.exe", "/app/entrypoint.ps1", "cmd.exe"] 
+ENTRYPOINT ["powershell.exe", "-ExecutionPolicy", "bypass", "-File", "/app/entrypoint.ps1"]
