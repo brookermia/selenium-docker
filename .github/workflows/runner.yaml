@@ -27,23 +27,23 @@ jobs:
     - name: Enable Developer Mode for WinAppDriver
       run: Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" -Name "AllowDevelopmentWithoutDevLicense" -Value 1
 
-    # - name: Download Shift Installer
-    #   run: |
-    #     $shiftInstallerUrl = "<URL_TO_SHIFT_INSTALLER>"
-    #     Invoke-WebRequest -Uri $shiftInstallerUrl -OutFile "C:\ShiftInstaller.exe"
-    #     if (Test-Path "C:\ShiftInstaller.exe") {
-    #       Write-Output "Shift installer downloaded successfully."
-    #     } else {
-    #       throw "Failed to download Shift installer."
-    #     }
+    - name: Download Shift Installer
+      run: |
+        $shiftInstallerUrl = "https://app.shift.com/recipes/1?tracking_id=test_production_full"
+        Invoke-WebRequest -Uri $shiftInstallerUrl -OutFile "C:\ShiftInstaller.exe"
+        if (Test-Path "C:\ShiftInstaller.exe") {
+          Write-Output "Shift installer downloaded successfully."
+        } else {
+          throw "Failed to download Shift installer."
+        }
 
-    # - name: Install Shift
-    #   run: |
-    #     if (Test-Path "C:\ShiftInstaller.exe") {
-    #       Start-Process -FilePath "C:\ShiftInstaller.exe" -ArgumentList "/silent" -NoNewWindow -Wait
-    #     } else {
-    #       throw "Shift installer is not available."
-    #     }
+    - name: Install Shift
+      run: |
+        if (Test-Path "C:\ShiftInstaller.exe") {
+          Start-Process -FilePath "C:\ShiftInstaller.exe" -ArgumentList "/silent" -NoNewWindow -Wait
+        } else {
+          throw "Shift installer is not available."
+        }
 
     - name: Install Google Chrome
       run: |
@@ -58,10 +58,10 @@ jobs:
         $env:Path += ";C:\chromedriver"
 
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore app/src/SeleniumDocker.sln
 
     - name: Build
-      run: dotnet build app/ --configuration Release --no-restore
+      run: dotnet build app/src/SeleniumDocker.sln --configuration Release --no-restore
 
     - name: Run tests
-      run: dotnet test app/ --no-build --verbosity normal
+      run: dotnet test app/src/SeleniumDocker.sln --no-build --verbosity normal
