@@ -1,16 +1,20 @@
 using System;
-using System.Threading;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
+
 namespace SeleniumDocker
 {
+    [TestClass]
     public class TestRdbrck : BasePage
     {
         public TestRdbrck(bool headless = true) : base(headless) { }
 
+        [TestMethod]
         public void TestRdbrckHomepage()
         {
             try
             {
-
                 // Navigate to Google
                 driver.Navigate().GoToUrl("https://www.rdbrck.com/");
 
@@ -28,7 +32,6 @@ namespace SeleniumDocker
             {
                 Console.WriteLine($"Test Failed: {e.Message}");
             }
-
             finally
             {
                 CloseBrowser();
