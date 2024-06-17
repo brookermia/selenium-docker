@@ -20,26 +20,19 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build Docker image
-        run: docker build -t miabrooker1/shift-automation:latest -f ./app/Dockerfile.windows .
+      - name: Pull cache image
+        run: docker pull miabrooker1/shift-automation:cache || exit 0
 
-      - name: Push Docker image to DockerHub
-        run: docker push miabrooker1/shift-automation:latest
-
-  run:
-    needs: build
-    runs-on: windows-latest
-
-    steps:
-      - name: Log in to DockerHub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Pull Docker image
-        run: docker pull miabrooker1/shift-automation:latest
-
-      - name: Run Docker container
+      - name: Build Docker image with cache
         run: |
-          docker run --rm miabrooker1/shift-automation:latest --headless
+          docker build \
+          --cache-from=miabrooker1/shift-automation:windows-cache \
+          --tag miabrooker1/shift-automation:windows-latest \
+          --file ./app/Dockerfile.windows \
+          .
+
+      - name: Tag cache image
+        run: docker tag miabrooker1/shift-automation:windows-latest miabrooker1/shift-automation:windows-cache
+
+      - name: Push cache image to DockerHub
+        run: docker push miabrooker1/shift-automation:windows-cache
