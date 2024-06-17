@@ -21,7 +21,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Pull cache image
-        run: docker pull miabrooker1/shift-automation:cache || exit 0
+        run: docker pull miabrooker1/shift-automation:windows-cache || exit 0
 
       - name: Build Docker image with cache
         run: |
