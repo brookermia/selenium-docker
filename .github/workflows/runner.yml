@@ -48,6 +48,11 @@ jobs:
             throw "Shift installer is not available."
           }
 
+      - name: Move Shift executable to app directory
+        run: |
+          Move-Item -Path "$env:LOCALAPPDATA\Shift\chromium\shift.exe" -Destination "app\shift.exe"
+          Write-Output "Shift executable has been moved successfully."
+
       - name: Install Google Chrome
         run: |
           Invoke-WebRequest -Uri "https://dl.google.com/chrome/install/latest/chrome_installer.exe" -OutFile "C:\chrome_installer.exe"
@@ -93,7 +98,7 @@ jobs:
             app/obj
             app/SeleniumDocker.sln
             app/src/SeleniumDocker.csproj
-            $env:LOCALAPPDATA\Shift\chromium\shift.exe
+            app/shift.exe
 
   run:
     needs: build
@@ -132,10 +137,9 @@ jobs:
 
       - name: Start Shift
         run: |
-          $shiftPath = "$env:LOCALAPPDATA\Shift\chromium\shift.exe"
+          $shiftPath = "app\shift.exe"
           if (Test-Path $shiftPath) {
             Start-Process -FilePath $shiftPath
             Write-Output "Shift started successfully."
           } else {
             Write-Output "Shift executable not found at $shiftPath."
-          }
