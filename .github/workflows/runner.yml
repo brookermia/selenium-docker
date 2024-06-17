@@ -77,11 +77,12 @@ jobs:
     - name: Run tests
       run: dotnet test app/SeleniumDocker.sln --no-build --verbosity normal
 
-    - name: Download and Install ngrok
+    - name: Install Chocolatey
       run: |
-        Invoke-WebRequest -Uri "https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip" -OutFile "C:\ngrok.zip"
-        Expand-Archive -Path "C:\ngrok.zip" -DestinationPath "C:\ngrok"
-        $env:Path += ";C:\ngrok"
+        Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+
+    - name: Install ngrok using Chocolatey
+      run: choco install ngrok -y
 
     - name: Start ngrok
       run: |
@@ -91,3 +92,4 @@ jobs:
     - name: Keep Runner Alive
       run: |
         while true; do sleep 300; done
+
