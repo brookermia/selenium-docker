@@ -25,10 +25,10 @@ jobs:
 
       - name: Build Docker image with cache
         run: |
-          docker build \
-          --cache-from=miabrooker1/shift-automation:windows-cache \
-          --tag miabrooker1/shift-automation:windows-latest \
-          --file ./app/Dockerfile.windows \
+          docker build `
+          --cache-from=miabrooker1/shift-automation:windows-cache `
+          --tag miabrooker1/shift-automation:windows-latest `
+          --file ./app/Dockerfile.windows `
           .
 
       - name: Tag cache image
