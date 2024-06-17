@@ -99,7 +99,24 @@ jobs:
           } else {
             Write-Output "Shift executable not found at $shiftPath."
           }
-    
-      - name: Keep Runner Alive
+
+      - name: Take Screenshot
         run: |
-          while ($true) { Start-Sleep -Seconds 300 }
+          $screenshotPath = "C:\Users\runneradmin\Desktop\screenshot.png"
+          Add-Type -AssemblyName System.Windows.Forms
+          Add-Type -AssemblyName System.Drawing
+          $bounds = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
+          $bitmap = New-Object System.Drawing.Bitmap $bounds.Width, $bounds.Height
+          $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
+          $graphics.CopyFromScreen($bounds.Location, [System.Drawing.Point]::Empty, $bounds.Size)
+          $bitmap.Save($screenshotPath, [System.Drawing.Imaging.ImageFormat]::Png)
+          WritOutput "Screenshot taken: $screenshotPath"
+    
+      - name: Upload Screenshot
+        uses: actions/upload-artifact@v2
+        with:
+          name: screenshot
+          path: C:\Users\runneradmin\Desktop\screenshot.png
+
+      - name: Wait for 2 Minutes
+        run: Start-Sleep -Seconds 120
