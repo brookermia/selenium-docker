@@ -137,6 +137,7 @@ jobs:
             Write-Output "Shift started successfully."
           } else {
             Write-Output "Shift executable not found at $shiftPath."
+          }
 
       - name: Keep Runner Alive
         run: |
