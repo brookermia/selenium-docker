@@ -27,26 +27,25 @@ jobs:
     - name: Enable Developer Mode for WinAppDriver
       run: Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" -Name "AllowDevelopmentWithoutDevLicense" -Value 1
 
-    # - name: Download Shift Installer
-    #   run: |
-    #     $shiftInstallerUrl = "https://app.shift.com/recipes/1?tracking_id=test_production_full"
-    #     Invoke-WebRequest -Uri $shiftInstallerUrl -OutFile "C:\ShiftInstaller.exe"
-    #     if (Test-Path "C:\ShiftInstaller.exe") {
-    #       Write-Output "Shift installer downloaded successfully."
-    #     } else {
-    #       throw "Failed to download Shift installer."
-    #     }
-    - name: Install Shift
+    - name: Install TightVNC
       run: |
-        Write-Output "Looking for Shift installer in the app/downloads directory..."
-        $shiftInstaller = Get-ChildItem -Path "app/downloads" -Filter "Shift*.exe" | Select-Object -First 1
-        if ($shiftInstaller) {
-          Write-Output "Found Shift installer: $($shiftInstaller.FullName)"
-          Start-Process -FilePath $shiftInstaller.FullName -ArgumentList "/silent" -NoNewWindow -Wait -Timeout 300
-          Write-Output "Shift installation completed."
-        } else {
-          throw "Shift installer is not available."
-        }
+        Invoke-WebRequest -Uri "https://www.tightvnc.com/download/2.8.63/tightvnc-2.8.63-setup-64bit.msi" -OutFile "C:\tightvnc.msi"
+        Start-Process msiexec.exe -ArgumentList "/i C:\tightvnc.msi /quiet /norestart" -NoNewWindow -Wait
+        Set-ItemProperty -Path "HKLM:\SOFTWARE\TightVNC\Server" -Name "Password" -Value ([BitConverter]::ToString((New-Object Security.Cryptography.MD5CryptoServiceProvider).ComputeHash([System.Text.Encoding]::Unicode.GetBytes("your_password"))).Replace("-",""))
+        New-ItemProperty -Path "HKLM:\SOFTWARE\TightVNC\Server" -Name "AcceptRFBConnections" -Value 1 -PropertyType DWord -Force
+        Start-Service -Name "tvnserver"
+
+    # - name: Install Shift
+    #   run: |
+    #     Write-Output "Looking for Shift installer in the app/downloads directory..."
+    #     $shiftInstaller = Get-ChildItem -Path "app/downloads" -Filter "Shift*.exe" | Select-Object -First 1
+    #     if ($shiftInstaller) {
+    #       Write-Output "Found Shift installer: $($shiftInstaller.FullName)"
+    #       Start-Process -FilePath $shiftInstaller.FullName -ArgumentList "/silent" -Wait
+    #       Write-Output "Shift installation completed."
+    #     } else {
+    #       throw "Shift installer is not available."
+    #     }
 
     - name: Install Google Chrome
       run: |
@@ -77,3 +76,18 @@ jobs:
 
     - name: Run tests
       run: dotnet test app/SeleniumDocker.sln --no-build --verbosity normal
+
+    - name: Download and Install ngrok
+      run: |
+        Invoke-WebRequest -Uri "https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip" -OutFile "C:\ngrok.zip"
+        Expand-Archive -Path "C:\ngrok.zip" -DestinationPath "C:\ngrok"
+        $env:Path += ";C:\ngrok"
+
+    - name: Start ngrok
+      run: |
+        ngrok authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
+        ngrok tcp 5900 &
+
+    - name: Keep Runner Alive
+      run: |
+        while true; do sleep 300; done
