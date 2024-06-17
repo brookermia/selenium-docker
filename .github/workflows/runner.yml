@@ -93,6 +93,7 @@ jobs:
             app/obj
             app/SeleniumDocker.sln
             app/src/SeleniumDocker.csproj
+            $env:LOCALAPPDATA\Shift\chromium\shift.exe
 
   run:
     needs: build
@@ -138,7 +139,3 @@ jobs:
           } else {
             Write-Output "Shift executable not found at $shiftPath."
           }
-
-      - name: Keep Runner Alive
-        run: |
-          while ($true) { Start-Sleep -Seconds 300 }
