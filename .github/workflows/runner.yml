@@ -27,13 +27,13 @@ jobs:
       - name: Enable Developer Mode for WinAppDriver
         run: Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" -Name "AllowDevelopmentWithoutDevLicense" -Value 1
 
-      # - name: Install TightVNC
-      #   run: |
-      #     Invoke-WebRequest -Uri "https://www.tightvnc.com/download/2.8.84/tightvnc-2.8.84-gpl-setup-64bit.msi" -OutFile "C:\tightvnc.msi"
-      #     Start-Process msiexec.exe -ArgumentList "/i C:\tightvnc.msi /quiet /norestart" -NoNewWindow -Wait
-      #     Set-ItemProperty -Path "HKLM:\SOFTWARE\TightVNC\Server" -Name "Password" -Value ([BitConverter]::ToString((New-Object Security.Cryptography.MD5CryptoServiceProvider).ComputeHash([System.Text.Encoding]::Unicode.GetBytes("your_password"))).Replace("-",""))
-      #     New-ItemProperty -Path "HKLM:\SOFTWARE\TightVNC\Server" -Name "AcceptRFBConnections" -Value 1 -PropertyType DWord -Force
-      # Start-Service -Name "tvnserver"
+      - name: Install TightVNC
+        run: |
+          Invoke-WebRequest -Uri "https://www.tightvnc.com/download/2.8.84/tightvnc-2.8.84-gpl-setup-64bit.msi" -OutFile "C:\tightvnc.msi"
+          Start-Process msiexec.exe -ArgumentList "/i C:\tightvnc.msi /quiet /norestart" -NoNewWindow -Wait
+          Set-ItemProperty -Path "HKLM:\SOFTWARE\TightVNC\Server" -Name "Password" -Value ([BitConverter]::ToString((New-Object Security.Cryptography.MD5CryptoServiceProvider).ComputeHash([System.Text.Encoding]::Unicode.GetBytes("your_password"))).Replace("-",""))
+          New-ItemProperty -Path "HKLM:\SOFTWARE\TightVNC\Server" -Name "AcceptRFBConnections" -Value 1 -PropertyType DWord -Force
+          Start-Service -Name "tvnserver"
 
       - name: Install Shift
         run: |
@@ -82,14 +82,14 @@ jobs:
         run: |
           Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 
-      # - name: Install ngrok using Chocolatey
-      #   run: choco install ngrok -y
+      - name: Install ngrok using Chocolatey
+        run: choco install ngrok -y
 
-      # - name: Start ngrok
-      #   run: |
-      #     ngrok authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
-      #     ngrok tcp 5900 &
+      - name: Start ngrok
+        run: |
+          ngrok authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
+          ngrok tcp 5900 &
 
-      # - name: Keep Runner Alive
-      #   run: |
-      #     while true; do sleep 300; done
+      - name: Keep Runner Alive
+        run: |
+          while true; do sleep 300; done
