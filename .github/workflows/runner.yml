@@ -90,8 +90,9 @@ jobs:
         with:
           name: build-artifacts
           path: |
-            app/bin
             app/obj
+            app/SeleniumDocker.sln
+            app/src/SeleniumDocker.csproj
 
   run:
     needs: build
