@@ -123,6 +123,7 @@ jobs:
         with:
           name: build-artifacts
           path: app
+        continue-on-error: true
 
       - name: Run tests
         run: dotnet test app/SeleniumDocker.sln --no-build --verbosity normal
