@@ -110,7 +110,7 @@ jobs:
           $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
           $graphics.CopyFromScreen($bounds.Location, [System.Drawing.Point]::Empty, $bounds.Size)
           $bitmap.Save($screenshotPath, [System.Drawing.Imaging.ImageFormat]::Png)
-          WritOutput "Screenshot taken: $screenshotPath"
+          Write-Output "Screenshot taken: $screenshotPath"
     
       - name: Upload Screenshot
         uses: actions/upload-artifact@v2
