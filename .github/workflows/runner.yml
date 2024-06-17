@@ -90,6 +90,16 @@ jobs:
           ngrok authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
           ngrok tcp 5900 &
 
+          - name: Start Shift
+          run: |
+            $shiftPath = "$env:LOCALAPPDATA\Shift\chromium\shift.exe"
+            if (Test-Path $shiftPath) {
+              Start-Process -FilePath $shiftPath
+              Write-Output "Shift started successfully."
+            } else {
+              Write-Output "Shift executable not found at $shiftPath."
+            }
+    
       - name: Keep Runner Alive
         run: |
-          while true; do sleep 300; done
+          while ($true) { Start-Sleep -Seconds 300 }
