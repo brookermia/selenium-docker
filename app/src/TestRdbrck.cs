@@ -17,27 +17,24 @@ namespace SeleniumDocker
         [TestMethod]
         public void TestRdbrckHomepage()
         {
+            Console.WriteLine("I have hit the test file");
             try
             {
                 // Navigate to Redbrick homepage
                 driver.Navigate().GoToUrl("https://www.rdbrck.com/");
+                Console.WriteLine("I have navigated");
 
                 // Assert that the title is correct
-                if (driver.Title.Contains("Redbrllick"))
-                {
-                    Console.WriteLine("Test Passed: Redbrick homepage title is correct.");
-                }
-                else
-                {
-                    Console.WriteLine("Test Failed: Redbrick homepage title is incorrect.");
-                }
+                Assert.IsTrue(driver.Title.Contains("POPCORN"), "Test Failed: Redbrick homepage title is incorrect.");
+                // Console.WriteLine("Test Passed: Redbrick homepage title is correct.");
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Test Failed: {e.Message}");
+                Assert.Fail($"Test Failed: {e.Message}");
             }
             finally
             {
+                Console.WriteLine("I have closed the browser");
                 CloseBrowser();
             }
         }
