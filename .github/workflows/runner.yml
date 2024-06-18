@@ -17,34 +17,21 @@ jobs:
         with:
           dotnet-version: "5.0.x"
 
-      # - name: Install WinAppDriver
-      #   run: |
-      #     $downloadUrl = "https://github.com/microsoft/WinAppDriver/releases/download/v1.2.99/WindowsApplicationDriver-1.2.99-win-x86.exe"
-      #     $destinationPath = "C:\WindowsApplicationDriver.exe"
-
-      #     Write-Output "Downloading WinAppDriver from $downloadUrl"
-      #     Invoke-WebRequest -Uri $downloadUrl -OutFile $destinationPath
-
-      #     if (Test-Path $destinationPath) {
-      #         Write-Output "Downloaded WinAppDriver to $destinationPath"
-      #         Start-Process msiexec.exe -ArgumentList "/i $destinationPath /quiet /norestart" -NoNewWindow -Wait
-      #         Write-Output "WinAppDriver installation completed successfully."
-      #     } else {
-      #         Write-Error "Failed to download WinAppDriver."
-      #         throw "Failed to download WinAppDriver."
-      #     }
-
-      - name: Run WinAppDriver installation script
-        run: powershell -ExecutionPolicy Bypass -File "app/scripts/install-winappdriver.ps1"
-
-      - name: Check if WinAppDriver is installed
+      - name: Install WinAppDriver
         run: |
-          $installPath = "C:\Program Files (x86)\Windows Application Driver\WinAppDriver.exe"
-          if (Test-Path $installPath) {
-              Write-Output "WinAppDriver is installed at $installPath"
+          $downloadUrl = "https://github.com/microsoft/WinAppDriver/releases/download/v1.2.99/WindowsApplicationDriver-1.2.99-win-x86.exe"
+          $destinationPath = "C:\WindowsApplicationDriver.exe"
+
+          Write-Output "Downloading WinAppDriver from $downloadUrl"
+          Invoke-WebRequest -Uri $downloadUrl -OutFile $destinationPath
+
+          if (Test-Path $destinationPath) {
+              Write-Output "Downloaded WinAppDriver to $destinationPath"
+              Start-Process msiexec.exe -ArgumentList "/i $destinationPath /quiet /norestart" -NoNewWindow -Wait
+              Write-Output "WinAppDriver installation completed successfully."
           } else {
-              Write-Error "WinAppDriver is not installed."
-              throw "WinAppDriver is not installed."
+              Write-Error "Failed to download WinAppDriver."
+              throw "Failed to download WinAppDriver."
           }
 
       - name: Enable Developer Mode for WinAppDriver
