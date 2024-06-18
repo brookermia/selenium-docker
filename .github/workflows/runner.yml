@@ -37,15 +37,7 @@ jobs:
       - name: Enable Developer Mode for WinAppDriver
         run: Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" -Name "AllowDevelopmentWithoutDevLicense" -Value 1
 
-      - name: Cache ngrok
-        id: cache-ngrok
-        uses: actions/cache@v3
-        with:
-          path: C:\ProgramData\chocolatey\lib\ngrok
-          key: ngrok-${{ runner.os }}-v3.2.1
-
       - name: Install ngrok using Chocolatey
-        if: steps.cache-ngrok.outputs.cache-hit != 'true'
         run: choco install ngrok -y
         continue-on-error: true
 
