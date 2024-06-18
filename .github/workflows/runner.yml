@@ -15,9 +15,7 @@ jobs:
       - name: Set up .NET
         uses: actions/setup-dotnet@v2
         with:
-          dotnet-version: |
-            5.0.x
-            8.0.x
+          dotnet-version: "8.0.x"
 
       - name: Install WinAppDriver
         run: |
@@ -48,10 +46,10 @@ jobs:
             throw "Shift installer is not available."
           }
 
-      - name: Move Shift executable to app directory
-        run: |
-          Move-Item -Path "$env:LOCALAPPDATA\Shift\chromium\shift.exe" -Destination "app\shift.exe"
-          Write-Output "Shift executable has been moved successfully."
+      # - name: Move Shift executable to app directory
+      #   run: |
+      #     Move-Item -Path "$env:LOCALAPPDATA\Shift\chromium\shift.exe" -Destination "app\shift.exe"
+      #     Write-Output "Shift executable has been moved successfully."
 
       - name: Install Google Chrome
         run: |
@@ -90,12 +88,20 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nuget-
 
+      - name: Verify AppData Directory
+        run: |
+          if (Test-Path "$env:LOCALAPPDATA\Shift") {
+            Write-Output "AppData directory exists."
+          } else {
+            Write-Output "AppData directory does not exist."
+          }
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v2
         with:
           name: build-artifacts
           path: |
-            app/obj
+            $env:LOCALAPPDATA\Shift\
             app/SeleniumDocker.sln
             app/src/SeleniumDocker.csproj
             app/shift.exe
@@ -111,9 +117,7 @@ jobs:
       - name: Set up .NET
         uses: actions/setup-dotnet@v2
         with:
-          dotnet-version: |
-            5.0.x
-            8.0.x
+          dotnet-version: "8.0.x"
 
       - name: Restore dependencies
         uses: actions/cache@v2
@@ -137,7 +141,7 @@ jobs:
 
       - name: Start Shift
         run: |
-          $shiftPath = "app\shift.exe"
+          $shiftPath = "$env:LOCALAPPDATA\Shift\chromium\shift.exe"
           if (Test-Path $shiftPath) {
             Start-Process -FilePath $shiftPath
             Write-Output "Shift started successfully."
