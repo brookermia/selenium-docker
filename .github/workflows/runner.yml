@@ -34,12 +34,24 @@ jobs:
               throw "Failed to download WinAppDriver."
           }
 
+      - name: Check if WinAppDriver is installed
+        run: |
+          $installPath = "C:\Program Files (x86)\Windows Application Driver\WinAppDriver.exe"
+          if (Test-Path $installPath) {
+              Write-Output "WinAppDriver is installed at $installPath"
+          } else {
+              Write-Error "WinAppDriver is not installed."
+              throw "WinAppDriver is not installed."
+          }
+        continue-on-error: true
+
       - name: Enable Developer Mode for WinAppDriver
         run: Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" -Name "AllowDevelopmentWithoutDevLicense" -Value 1
 
       - name: Install ngrok using Chocolatey
         run: choco install ngrok -y
         continue-on-error: true
+
       # - name: Install TightVNC
       #   run: |
       #     Invoke-WebRequest -Uri "https://www.tightvnc.com/download/2.8.84/tightvnc-2.8.84-gpl-setup-64bit.msi" -OutFile "C:\tightvnc.msi"
