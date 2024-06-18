@@ -35,7 +35,7 @@ jobs:
       #     }
 
       - name: Run WinAppDriver installation script
-        run: powershell -ExecutionPolicy Bypass -File install-winappdriver.ps1
+        run: powershell -ExecutionPolicy Bypass -File "app/scripts/install-winappdriver.ps1"
 
       - name: Check if WinAppDriver is installed
         run: |
