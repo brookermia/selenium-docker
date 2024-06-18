@@ -17,22 +17,25 @@ jobs:
         with:
           dotnet-version: "5.0.x"
 
-      - name: Install WinAppDriver
-        run: |
-          $downloadUrl = "https://github.com/microsoft/WinAppDriver/releases/download/v1.2.99/WindowsApplicationDriver-1.2.99-win-x86.exe"
-          $destinationPath = "C:\WindowsApplicationDriver.exe"
+      # - name: Install WinAppDriver
+      #   run: |
+      #     $downloadUrl = "https://github.com/microsoft/WinAppDriver/releases/download/v1.2.99/WindowsApplicationDriver-1.2.99-win-x86.exe"
+      #     $destinationPath = "C:\WindowsApplicationDriver.exe"
 
-          Write-Output "Downloading WinAppDriver from $downloadUrl"
-          Invoke-WebRequest -Uri $downloadUrl -OutFile $destinationPath
+      #     Write-Output "Downloading WinAppDriver from $downloadUrl"
+      #     Invoke-WebRequest -Uri $downloadUrl -OutFile $destinationPath
 
-          if (Test-Path $destinationPath) {
-              Write-Output "Downloaded WinAppDriver to $destinationPath"
-              Start-Process msiexec.exe -ArgumentList "/i $destinationPath /quiet /norestart" -NoNewWindow -Wait
-              Write-Output "WinAppDriver installation completed successfully."
-          } else {
-              Write-Error "Failed to download WinAppDriver."
-              throw "Failed to download WinAppDriver."
-          }
+      #     if (Test-Path $destinationPath) {
+      #         Write-Output "Downloaded WinAppDriver to $destinationPath"
+      #         Start-Process msiexec.exe -ArgumentList "/i $destinationPath /quiet /norestart" -NoNewWindow -Wait
+      #         Write-Output "WinAppDriver installation completed successfully."
+      #     } else {
+      #         Write-Error "Failed to download WinAppDriver."
+      #         throw "Failed to download WinAppDriver."
+      #     }
+
+      - name: Run WinAppDriver installation script
+        run: powershell -ExecutionPolicy Bypass -File install-winappdriver.ps1
 
       - name: Check if WinAppDriver is installed
         run: |
@@ -43,22 +46,29 @@ jobs:
               Write-Error "WinAppDriver is not installed."
               throw "WinAppDriver is not installed."
           }
-        continue-on-error: true
 
       - name: Enable Developer Mode for WinAppDriver
         run: Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" -Name "AllowDevelopmentWithoutDevLicense" -Value 1
 
+      - name: Cache ngrok
+        id: cache-ngrok
+        uses: actions/cache@v3
+        with:
+          path: C:\ProgramData\chocolatey\lib\ngrok
+          key: ngrok-${{ runner.os }}-v3.2.1
+
       - name: Install ngrok using Chocolatey
+        if: steps.cache-ngrok.outputs.cache-hit != 'true'
         run: choco install ngrok -y
         continue-on-error: true
 
-      # - name: Install TightVNC
-      #   run: |
-      #     Invoke-WebRequest -Uri "https://www.tightvnc.com/download/2.8.84/tightvnc-2.8.84-gpl-setup-64bit.msi" -OutFile "C:\tightvnc.msi"
-      #     Start-Process msiexec.exe -ArgumentList "/i C:\tightvnc.msi /quiet /norestart" -NoNewWindow -Wait
-      #     Set-ItemProperty -Path "HKLM:\SOFTWARE\TightVNC\Server" -Name "Password" -Value ([BitConverter]::ToString((New-Object Security.Cryptography.MD5CryptoServiceProvider).ComputeHash([System.Text.Encoding]::Unicode.GetBytes("your_password"))).Replace("-",""))
-      #     New-ItemProperty -Path "HKLM:\SOFTWARE\TightVNC\Server" -Name "AcceptRFBConnections" -Value 1 -PropertyType DWord -Force
-      #     Start-Service -Name "tvnserver"
+      - name: Install TightVNC
+        run: |
+          Invoke-WebRequest -Uri "https://www.tightvnc.com/download/2.8.84/tightvnc-2.8.84-gpl-setup-64bit.msi" -OutFile "C:\tightvnc.msi"
+          Start-Process msiexec.exe -ArgumentList "/i C:\tightvnc.msi /quiet /norestart" -NoNewWindow -Wait
+          Set-ItemProperty -Path "HKLM:\SOFTWARE\TightVNC\Server" -Name "Password" -Value ([BitConverter]::ToString((New-Object Security.Cryptography.MD5CryptoServiceProvider).ComputeHash([System.Text.Encoding]::Unicode.GetBytes("your_password"))).Replace("-",""))
+          New-ItemProperty -Path "HKLM:\SOFTWARE\TightVNC\Server" -Name "AcceptRFBConnections" -Value 1 -PropertyType DWord -Force
+          Start-Service -Name "tvnserver"
 
       - name: Install Shift
         run: |
@@ -126,5 +136,5 @@ jobs:
           name: screenshot
           path: C:\Users\runneradmin\Desktop\screenshot.png
 
-      # - name: Wait for 2 Minutes
-      #   run: Start-Sleep -Seconds 120
+      - name: Wait for 2 Minutes
+        run: Start-Sleep -Seconds 120
