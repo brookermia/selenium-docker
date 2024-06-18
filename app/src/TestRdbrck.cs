@@ -23,7 +23,7 @@ namespace SeleniumDocker
                 driver.Navigate().GoToUrl("https://www.rdbrck.com/");
 
                 // Assert that the title is correct
-                if (driver.Title.Contains("Redbrick"))
+                if (driver.Title.Contains("Redbrllick"))
                 {
                     Console.WriteLine("Test Passed: Redbrick homepage title is correct.");
                 }

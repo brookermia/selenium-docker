@@ -47,18 +47,6 @@ jobs:
           }
         continue-on-error: true
 
-      # - name: Install Google Chrome
-      #   run: |
-      #     Invoke-WebRequest -Uri "https://dl.google.com/chrome/install/latest/chrome_installer.exe" -OutFile "C:\chrome_installer.exe"
-      #     Start-Process -FilePath "C:\chrome_installer.exe" -ArgumentList "/silent /install" -NoNewWindow -Wait
-
-      # - name: Install ChromeDriver
-      #   run: |
-      #     $chromeDriverVersion = Invoke-RestMethod -Uri "https://chromedriver.storage.googleapis.com/LATEST_RELEASE"
-      #     Invoke-WebRequest -Uri "https://chromedriver.storage.googleapis.com/$chromeDriverVersion/chromedriver_win32.zip" -OutFile "C:\chromedriver_win32.zip"
-      #     Expand-Archive -Path "C:\chromedriver_win32.zip" -DestinationPath "C:\chromedriver"
-      #     $env:Path += ";C:\chromedriver"
-
       - name: Print CHROMEWEBDRIVER variable
         run: echo $env:CHROMEWEBDRIVER
         continue-on-error: true
@@ -94,10 +82,6 @@ jobs:
       - name: Run tests
         run: dotnet test app/SeleniumDocker.sln --no-build --verbosity normal
         continue-on-error: true
-
-      # - name: Install Chocolatey
-      #   run: |
-      #     Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 
       - name: Install ngrok using Chocolatey
         run: choco install ngrok -y
