@@ -19,12 +19,27 @@ jobs:
 
       - name: Install WinAppDriver
         run: |
-          Invoke-WebRequest -Uri "https://github.com/microsoft/WinAppDriver/releases/download/v1.2.99/WindowsApplicationDriver-1.2.99-win-x86.exe" -OutFile "C:\WindowsApplicationDriver.exe"
-          Start-Process msiexec.exe -ArgumentList "/i C:\WindowsApplicationDriver.exe /quiet /norestart" -NoNewWindow -Wait
+          $downloadUrl = "https://github.com/microsoft/WinAppDriver/releases/download/v1.2.99/WindowsApplicationDriver-1.2.99-win-x86.exe"
+          $destinationPath = "C:\WindowsApplicationDriver.exe"
+
+          Write-Output "Downloading WinAppDriver from $downloadUrl"
+          Invoke-WebRequest -Uri $downloadUrl -OutFile $destinationPath
+
+          if (Test-Path $destinationPath) {
+              Write-Output "Downloaded WinAppDriver to $destinationPath"
+              Start-Process msiexec.exe -ArgumentList "/i $destinationPath /quiet /norestart" -NoNewWindow -Wait
+              Write-Output "WinAppDriver installation completed successfully."
+          } else {
+              Write-Error "Failed to download WinAppDriver."
+              throw "Failed to download WinAppDriver."
+          }
 
       - name: Enable Developer Mode for WinAppDriver
         run: Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" -Name "AllowDevelopmentWithoutDevLicense" -Value 1
 
+      - name: Install ngrok using Chocolatey
+        run: choco install ngrok -y
+        continue-on-error: true
       # - name: Install TightVNC
       #   run: |
       #     Invoke-WebRequest -Uri "https://www.tightvnc.com/download/2.8.84/tightvnc-2.8.84-gpl-setup-64bit.msi" -OutFile "C:\tightvnc.msi"
@@ -47,25 +62,6 @@ jobs:
           }
         continue-on-error: true
 
-      - name: Print CHROMEWEBDRIVER variable
-        run: echo $env:CHROMEWEBDRIVER
-        continue-on-error: true
-
-      - name: Check Google Chrome version
-        run: google-chrome --version
-        continue-on-error: true
-
-      - name: Check choco version
-        run: choco --version
-        continue-on-error: true
-
-      - name: Check Chromedriver version
-        run: chromedriver --version
-        continue-on-error: true
-
-      - name: List files in app directory
-        run: dir app
-
       - name: Create solution file
         run: |
           dotnet new sln -n SeleniumDocker --force
@@ -81,10 +77,6 @@ jobs:
 
       - name: Run tests
         run: dotnet test app/SeleniumDocker.sln --no-build --verbosity normal
-        continue-on-error: true
-
-      - name: Install ngrok using Chocolatey
-        run: choco install ngrok -y
         continue-on-error: true
 
       - name: Start ngrok
@@ -122,5 +114,5 @@ jobs:
           name: screenshot
           path: C:\Users\runneradmin\Desktop\screenshot.png
 
-      - name: Wait for 2 Minutes
-        run: Start-Sleep -Seconds 120
+      # - name: Wait for 2 Minutes
+      #   run: Start-Sleep -Seconds 120

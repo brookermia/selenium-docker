@@ -17,16 +17,10 @@ namespace SeleniumDocker
         [TestMethod]
         public void TestRdbrckHomepage()
         {
-            Console.WriteLine("I have hit the test file");
             try
             {
-                // Navigate to Redbrick homepage
                 driver.Navigate().GoToUrl("https://www.rdbrck.com/");
-                Console.WriteLine("I have navigated");
-
-                // Assert that the title is correct
-                Assert.IsTrue(driver.Title.Contains("POPCORN"), "Test Failed: Redbrick homepage title is incorrect.");
-                // Console.WriteLine("Test Passed: Redbrick homepage title is correct.");
+                Assert.IsTrue(driver.Title.Contains("Redbrick"), "Test Failed: Redbrick homepage title is incorrect.");
             }
             catch (Exception e)
             {
@@ -34,7 +28,6 @@ namespace SeleniumDocker
             }
             finally
             {
-                Console.WriteLine("I have closed the browser");
                 CloseBrowser();
             }
         }
