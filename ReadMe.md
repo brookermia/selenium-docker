@@ -1,3 +1,44 @@
+# 👟GitHub Runner POV
+
+GitHub runner has officially been chosen to host our test framework in the CI/CD pipeline. At least for Windows UI tests. See the confluence Doc for all the findings
+
+[🔁Test Automation Docker CI/CD Proof of Concept](https://redbrickmedia.atlassian.net/wiki/spaces/TRON/pages/3032416262/Test+Automation+Docker+CI+CD+Proof+of+Concept)
+
+### ✅Acceptance Criteria:
+
+1. Dependencies are installed (Shift, WinAppDriver…)
+2. Shift product can be installed
+3. The steps are documented steps to install or be installed
+
+We are using the `Windows-latest` runner image which come installed with chrome, chrome driver and chocolatey. Winappdriver and ShiftX are installed using scripts found in the scripts directory.
+
+The runner can be run by navigating to the Windows Runner in the Actions tab of the Repo and clicking `Run Workflow` on the `main` branch
+
+[Windows Runner · Workflow runs · brookermia/selenium-docker](https://github.com/brookermia/selenium-docker/actions/workflows/runner.yml)
+
+### 🏠Running Locally
+
+At this time you _can_ run the tests manually however, it’s a bit clunky.
+
+1. You have to make sure you have dotnet version 5 installed or simply change the `SeleniumDocker.csproj` to use the version of dotnet you have.
+2. In the SeleniumDocker.sln in line 6 change `selenium-docker.csproj` to `src/SeleniumDocker.csproj`
+   NOTE: I am currently trying ton figure out why this is an issue
+3. Navigate to the app/src directory and run `dotnet build` —> `dotnet test ../SeleniumDocker.sln --no-build --verbosity normal`
+
+### 🤯Headless Option
+
+You can run the tests headless or with UI by changing the ENV variable in powershell before running the test:
+
+`$env:RUN_HEADLESS = "false"` = UI
+
+`$env:RUN_HEADLESS = "true"` = Headless
+
+See what it is currently set to using `echo $env:RUN_HEADLESS`
+
+_I dont know if we need this fuctionality but it was more experimenting with using env variables to pass in arguments_
+
+**Archived Docker ReadMe**
+
 # SPIKE - setup docker and run automated test and view test running
 
 https://redbrickmedia.atlassian.net/browse/ST-1699
@@ -29,7 +70,7 @@ You need [docker desktop](https://www.docker.com/products/docker-desktop/) runni
 
 `docker build -t selenium-container . -f app/Dockerfile`
 
-  *Needed to add `-f app/Dockerfile` because `app/` isn’t my root directory*
+_Needed to add `-f app/Dockerfile` because `app/` isn’t my root directory_
 
 **Non-headless:**
 
@@ -112,4 +153,4 @@ WORKDIR /app
 COPY --from=build-env /app/src/out .
 ```
 
-We can use multiple dockerfiles so a separate one will need to be made for Mac🍎capability. 
+We can use multiple dockerfiles so a separate one will need to be made for Mac🍎capability.
