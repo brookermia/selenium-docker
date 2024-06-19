@@ -30,9 +30,7 @@ jobs:
         run: Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" -Name "AllowDevelopmentWithoutDevLicense" -Value 1
 
       - name: Create solution file
-        run: |
-          dotnet new sln -n SeleniumDocker --force
-          dotnet sln SeleniumDocker.sln add src/SeleniumDocker.csproj
+        run: dotnet sln app/SeleniumDocker.sln add src/SeleniumDocker.csproj
         working-directory: app
 
       - name: Restore dependencies

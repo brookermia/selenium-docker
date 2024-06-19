@@ -21,9 +21,7 @@ The runner can be run by navigating to the Windows Runner in the Actions tab of 
 At this time you _can_ run the tests manually however, it’s a bit clunky.
 
 1. You have to make sure you have dotnet version 5 installed or simply change the `SeleniumDocker.csproj` to use the version of dotnet you have.
-2. In the SeleniumDocker.sln in line 6 change `selenium-docker.csproj` to `src/SeleniumDocker.csproj`
-   NOTE: I am currently trying ton figure out why this is an issue
-3. Navigate to the app/src directory and run `dotnet build` —> `dotnet test ../SeleniumDocker.sln --no-build --verbosity normal`
+2. Navigate to the app/src directory and run `dotnet build` —> `dotnet test ../SeleniumDocker.sln --no-build --verbosity normal`
 
 ### 🤯Headless Option
 
