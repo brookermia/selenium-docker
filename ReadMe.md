@@ -1,4 +1,4 @@
-# 👟GitHub Runner POV
+# 👟GitHub Runner POC
 
 GitHub runner has officially been chosen to host our test framework in the CI/CD pipeline. At least for Windows UI tests. See the confluence Doc for all the findings
 
