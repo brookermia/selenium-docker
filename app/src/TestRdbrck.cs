@@ -1,34 +1,31 @@
 using System;
-using System.Threading;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
+
 namespace SeleniumDocker
 {
+    [TestClass]
     public class TestRdbrck : BasePage
     {
-        public TestRdbrck(bool headless = true) : base(headless) { }
+        // Parameterless constructor required by MSTest
+        public TestRdbrck() : base() { }
 
+        // Constructor with parameters (optional)
+        public TestRdbrck(bool headless) : base(headless) { }
+
+        [TestMethod]
         public void TestRdbrckHomepage()
         {
             try
             {
-
-                // Navigate to Google
                 driver.Navigate().GoToUrl("https://www.rdbrck.com/");
-
-                // Assert that the title is correct
-                if (driver.Title.Contains("Redbrick"))
-                {
-                    Console.WriteLine("Test Passed: Redbrick homepage title is correct.");
-                }
-                else
-                {
-                    Console.WriteLine("Test Failed: Redbrick homepage title is incorrect.");
-                }
+                Assert.IsTrue(driver.Title.Contains("Redbrick"), "Test Failed: Redbrick homepage title is incorrect.");
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Test Failed: {e.Message}");
+                Assert.Fail($"Test Failed: {e.Message}");
             }
-
             finally
             {
                 CloseBrowser();

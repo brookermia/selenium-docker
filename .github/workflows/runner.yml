@@ -1,0 +1,78 @@
+name: .NET CI
+
+on:
+  push: {}
+  pull_request: {}
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: "5.0.x"
+
+      - name: Run Shift installation script
+        run: powershell -ExecutionPolicy Bypass -File "app/scripts/install-shift.ps1"
+        continue-on-error: true
+
+      - name: Run WinAppDriver installation script
+        run: powershell -ExecutionPolicy Bypass -File "app/scripts/install-winappdriver.ps1"
+        continue-on-error: true
+
+      - name: Enable Developer Mode for WinAppDriver
+        run: Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" -Name "AllowDevelopmentWithoutDevLicense" -Value 1
+
+      - name: Create solution file
+        run: |
+          dotnet new sln -n SeleniumDocker --force
+          dotnet sln SeleniumDocker.sln add src/SeleniumDocker.csproj
+        working-directory: app
+
+      - name: Restore dependencies
+        run: dotnet restore app/SeleniumDocker.sln
+
+      - name: Build
+        run: dotnet build app/SeleniumDocker.sln --configuration Debug --no-restore
+        continue-on-error: true
+
+      - name: Run tests
+        run: dotnet test app/SeleniumDocker.sln --no-build --verbosity normal
+        continue-on-error: true
+
+        #POC
+      - name: Start Shift
+        run: |
+          $shiftPath = "$env:LOCALAPPDATA\Shift\chromium\shift.exe"
+          if (Test-Path $shiftPath) {
+            Start-Process -FilePath $shiftPath
+            Write-Output "Shift started successfully."
+          } else {
+            Write-Output "Shift executable not found at $shiftPath."
+          }
+        continue-on-error: true
+
+        #POC
+      - name: Take Screenshot
+        run: |
+          $screenshotPath = "C:\Users\runneradmin\Desktop\screenshot.png"
+          Add-Type -AssemblyName System.Windows.Forms
+          Add-Type -AssemblyName System.Drawing
+          $bounds = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
+          $bitmap = New-Object System.Drawing.Bitmap $bounds.Width, $bounds.Height
+          $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
+          $graphics.CopyFromScreen($bounds.Location, [System.Drawing.Point]::Empty, $bounds.Size)
+          $bitmap.Save($screenshotPath, [System.Drawing.Imaging.ImageFormat]::Png)
+          Write-Output "Screenshot taken: $screenshotPath"
+
+        #POC
+      - name: Upload Screenshot
+        uses: actions/upload-artifact@v2
+        with:
+          name: screenshot
+          path: C:\Users\runneradmin\Desktop\screenshot.png
