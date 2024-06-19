@@ -45,6 +45,7 @@ jobs:
         run: dotnet test app/SeleniumDocker.sln --no-build --verbosity normal
         continue-on-error: true
 
+        #POC
       - name: Start Shift
         run: |
           $shiftPath = "$env:LOCALAPPDATA\Shift\chromium\shift.exe"
@@ -56,6 +57,7 @@ jobs:
           }
         continue-on-error: true
 
+        #POC
       - name: Take Screenshot
         run: |
           $screenshotPath = "C:\Users\runneradmin\Desktop\screenshot.png"
@@ -68,11 +70,9 @@ jobs:
           $bitmap.Save($screenshotPath, [System.Drawing.Imaging.ImageFormat]::Png)
           Write-Output "Screenshot taken: $screenshotPath"
 
+        #POC
       - name: Upload Screenshot
         uses: actions/upload-artifact@v2
         with:
           name: screenshot
           path: C:\Users\runneradmin\Desktop\screenshot.png
-
-      - name: Wait for 2 Minutes
-        run: Start-Sleep -Seconds 120

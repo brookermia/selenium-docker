@@ -9,7 +9,7 @@ namespace SeleniumDocker
     public class TestRdbrck : BasePage
     {
         // Parameterless constructor required by MSTest
-        public TestRdbrck() : base(true) { }
+        public TestRdbrck() : base() { }
 
         // Constructor with parameters (optional)
         public TestRdbrck(bool headless) : base(headless) { }
