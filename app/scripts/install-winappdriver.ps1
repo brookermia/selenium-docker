@@ -9,10 +9,10 @@ $process.WaitForExit()
 $winAppDriverPath = "C:\Program Files (x86)\Windows Application Driver\WinAppDriver.exe"
 if (Test-Path $winAppDriverPath) {
     Write-Output "WinAppDriver installation completed successfully."
-    
+
     # Start WinAppDriver to verify it runs correctly
     try {
-        Start-Process -FilePath $winAppDriverPath -ArgumentList "/quiet" -NoNewWindow -Wait
+        Start-Process -FilePath $winAppDriverPath -ArgumentList "/silent" -NoNewWindow -Wait
         Write-Output "WinAppDriver started successfully."
     } catch {
         Write-Error "Failed to start WinAppDriver."
