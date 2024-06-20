@@ -1,18 +1,15 @@
 # install-winappdriver.ps1
 
-$downloadUrl = "https://github.com/microsoft/WinAppDriver/releases/download/v1.2.99/WindowsApplicationDriver-1.2.99-win-x86.exe"
-$destinationPath = "C:\WindowsApplicationDriver.exe"
+# Install WinAppDriver using Chocolatey
+Write-Output "Installing WinAppDriver using Chocolatey"
+choco install winappdriver -y
 
-Write-Output "Downloading WinAppDriver from $downloadUrl"
-Invoke-WebRequest -Uri $downloadUrl -OutFile $destinationPath
-
-if (Test-Path $destinationPath) {
-    Write-Output "Downloaded WinAppDriver to $destinationPath"
-    Start-Process msiexec.exe -ArgumentList "/i $destinationPath /quiet /norestart" -NoNewWindow -Wait
+# Verify installation
+if (Get-Command "WinAppDriver.exe" -ErrorAction SilentlyContinue) {
     Write-Output "WinAppDriver installation completed successfully."
 } else {
-    Write-Error "Failed to download WinAppDriver."
-    throw "Failed to download WinAppDriver."
+    Write-Error "Failed to install WinAppDriver."
+    throw "Failed to install WinAppDriver."
 }
 
 Write-Output "Enabling developer mode in Windows container"
