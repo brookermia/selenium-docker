@@ -16,7 +16,7 @@ jobs:
       - name: Set up .NET
         uses: actions/setup-dotnet@v2
         with:
-          dotnet-version: "5.0.x"
+          dotnet-version: "8.0.x"
 
       - name: Run Shift installation script
         run: powershell -ExecutionPolicy Bypass -File "app/scripts/install-shift.ps1"
@@ -25,9 +25,6 @@ jobs:
       - name: Run WinAppDriver installation script
         run: powershell -ExecutionPolicy Bypass -File "app/scripts/install-winappdriver.ps1"
         continue-on-error: true
-
-      - name: Enable Developer Mode for WinAppDriver
-        run: Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" -Name "AllowDevelopmentWithoutDevLicense" -Value 1
 
       - name: Restore dependencies
         run: dotnet restore app/SeleniumDocker.sln
