@@ -26,9 +26,6 @@ jobs:
         run: powershell -ExecutionPolicy Bypass -File "app/scripts/install-winappdriver.ps1"
         continue-on-error: true
 
-      - name: Enable Developer Mode for WinAppDriver
-        run: Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" -Name "AllowDevelopmentWithoutDevLicense" -Value 1
-
       - name: Restore dependencies
         run: dotnet restore app/SeleniumDocker.sln
 

@@ -14,3 +14,6 @@ if (Test-Path $destinationPath) {
     Write-Error "Failed to download WinAppDriver."
     throw "Failed to download WinAppDriver."
 }
+
+Write-Output "Enabling developer mode in Windows container"
+Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" -Name "AllowDevelopmentWithoutDevLicense" -Value 1
